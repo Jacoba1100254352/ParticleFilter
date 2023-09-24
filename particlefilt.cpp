@@ -30,7 +30,7 @@ using namespace std;	// provide easy access to cout, cin, etc.
 void printPositions(Robot actualRobot, Robot robotParticle[], RobotField robotField, int N);
 // the function prototype printPosition, will have the functions in the parentethese,
 // -- pass their information on to be stored in printPosition
-void resample(Robot robotParticle[], Robot robotParticleTemp[], int N, const float w[]);
+void resample(Robot robotParticle[], Robot robotParticleTemp[], int N, float w[]);
 // the function prototype resample, will have the functions in the parentethese,
 // -- pass their information on to be stored in resample
 
@@ -90,10 +90,10 @@ int main()
     // Now we need to initialize the robot particles //
     ///////////////////////////////////////////////////
 // below we have robotField because // getSizex()
-    srand(time(nullptr));     // initialize random seed
+    srand(time(NULL));     // initialize random seed
     newX = rand() % static_cast<int>(robotField.getSizeX());     // get random coordinates for position X and position Y
     newY = rand() % static_cast<int>(robotField.getSizeY());     // should understand rand gives you a number between 0 and RAND_MAX
-    newO = static_cast<float>((rand() % 628) / 100.0);                        // and a random orientation
+    newO = ((rand() % 628) / 100.0);                        // and a random orientation
     /*Place the actual Robot at the new random placement in the field */
     actualRobot.initializeField(newX, newY, newO, robotField);
     // this creates an object named initializeField under actual robot that takes the data from these objects
@@ -105,7 +105,7 @@ int main()
     {
         newX = rand() % static_cast<int>(robotField.getSizeX());
         newY = rand() % static_cast<int>(robotField.getSizeY());
-        newO = static_cast<float>((rand() % 628) / 100.0);
+        newO = ((rand() % 628) / 100.0);
         robotParticle[k].initializeField(newX, newY, newO, robotField);
 // this as shown before, except rather than actual Robot, this is working with each robotParticle, thus it corresponds to k, which was explained
     }
@@ -121,11 +121,11 @@ int main()
     for (its = 0; its < ITERATIONS; its++)      // run the particle filter a few iterations defined by ITERATIONS
     {
         // move the actual robot and simulate the inexact motion and steering by including noise values
-        actualRobot.move(2.0,0.2, static_cast<float>(motionNoise(generator)), static_cast<float>(steeringNoise(generator)));
+        actualRobot.move(2.0,0.2, motionNoise(generator), steeringNoise(generator));
 
         // get the robot sensor readings -- they will be returned in the array readings[] (passed by reference)
         // note: we add noise to the sensor readings also
-        actualRobot.getSensorReadings(readings, 4, static_cast<float>(sensorNoise(generator)));
+        actualRobot.getSensorReadings(readings, 4, sensorNoise(generator));
 
         // now we loop through each particle and evaluate its likelihood
         for (k = 0; k < N_PARTICLES; k++)
@@ -146,8 +146,8 @@ int main()
         // ----------------------------------------
         for (k = 0; k < N_PARTICLES; k++)
         {
-            robotParticle[k].move(2.0,0.2, static_cast<float>(motionNoise(generator)), static_cast<float>(steeringNoise(generator))); // there may need to be more added here
-            robotParticle[k].getSensorReadings(readings, 4, static_cast<float>(sensorNoise(generator))); // I think this was all that was needed to be added
+            robotParticle[k].move(2.0,0.2, motionNoise(generator), steeringNoise(generator)); // there may need to be more added here
+            robotParticle[k].getSensorReadings(readings, 4, sensorNoise(generator)); // I think this was all that was needed to be added
         }
         // ----------------------------------------
     }
@@ -185,7 +185,7 @@ int main()
 // Define the resampling function                //
 ///////////////////////////////////////////////////
 
-void resample(Robot robotParticle[], Robot robotParticleTemp[], int N, const float w[])
+void resample(Robot robotParticle[], Robot robotParticleTemp[], int N, float w[])
 {
     float       maxW = 0.0; // initializes maxW to 0
     float       step; // names function step as a float, will be used to determine where the robotparticles land
@@ -202,7 +202,7 @@ void resample(Robot robotParticle[], Robot robotParticleTemp[], int N, const flo
     }
     for (k = 0; k < N; k++)
     {
-        step = static_cast<float>((rand() / RAND_MAX) * (2.0 * maxW));
+        step = (static_cast<float>(rand()) / RAND_MAX) * (2.0 * maxW);
         while(step > w[index])
         {
             step -= w[index];
@@ -258,7 +258,8 @@ void printPositions(Robot actualRobot,Robot robotParticle[], RobotField robotFie
     float maxR; // introduces object maxR, that will be used to store a number with a value of 0.something
     float maxC; // introduces object maxC, that will be used to store a number with a value of 0.something
 
-    if (!PRINT) return;
+    if (!PRINT)
+        return;
 
     maxR = robotField.getSizeY(); // maxR uses object sizeY used in robotField
     maxC = robotField.getSizeX(); // maxR uses object sizeX used in robotField
